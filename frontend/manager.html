@@ -51,6 +51,7 @@
   .logout-btn:hover { background: rgba(255,106,142,0.08); border-color: rgba(255,106,142,0.3); }
 
   .main { margin-left: 220px; flex: 1; padding: 32px; min-height: 100vh; }
+
   .page { display: none; }
   .page.active { display: block; animation: fadeIn 0.3s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -59,6 +60,7 @@
   .page-title { font-family: var(--sans); font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
   .page-subtitle { color: var(--muted); font-size: 12px; margin-top: 4px; }
 
+  /* Stats */
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; margin-bottom: 28px; }
   .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; position: relative; overflow: hidden; transition: border-color 0.2s; }
   .stat-card:hover { border-color: var(--accent); }
@@ -72,9 +74,11 @@
   .stat-value { font-family: var(--sans); font-size: 30px; font-weight: 800; letter-spacing: -1px; margin-bottom: 4px; }
   .stat-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
 
+  /* Cards */
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
   .card-title { font-family: var(--sans); font-size: 14px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 
+  /* Forms */
   .field { margin-bottom: 14px; }
   label { display: block; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
 
@@ -88,14 +92,9 @@
   select option { background: var(--surface); }
   textarea { resize: vertical; min-height: 80px; }
 
-  /* FIX: no custom background SVGs — they block the native picker click */
-  input[type="date"], input[type="time"] {
-    cursor: pointer;
-    color-scheme: dark;
-  }
-
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
+  /* Buttons */
   .btn { padding: 10px 18px; border: none; border-radius: 8px; background: var(--accent); color: #fff; font-family: var(--mono); font-size: 13px; cursor: pointer; transition: all 0.15s; }
   .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
   .btn:active { transform: none; }
@@ -108,18 +107,21 @@
   .btn-success { background: rgba(74,222,128,0.15); border: 1px solid rgba(74,222,128,0.3); color: var(--success); }
   .btn-success:hover { background: rgba(74,222,128,0.25); transform: none; filter: none; }
 
+  /* Table */
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
   td { padding: 12px; border-bottom: 1px solid rgba(42,42,61,0.5); vertical-align: middle; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: rgba(124,106,255,0.02); }
 
+  /* Badges */
   .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; letter-spacing: 0.5px; }
   .badge-pending    { background: rgba(251,191,36,0.12); color: var(--warning); border: 1px solid rgba(251,191,36,0.2); }
   .badge-in_progress { background: rgba(96,165,250,0.12); color: #60a5fa; border: 1px solid rgba(96,165,250,0.2); }
   .badge-completed  { background: rgba(74,222,128,0.12); color: var(--success); border: 1px solid rgba(74,222,128,0.2); }
   .badge-overdue    { background: rgba(255,106,142,0.12); color: var(--error); border: 1px solid rgba(255,106,142,0.2); }
 
+  /* Pagination */
   .pagination { display: flex; align-items: center; gap: 8px; margin-top: 16px; justify-content: flex-end; flex-wrap: wrap; }
   .page-btn { padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; background: transparent; color: var(--muted); font-family: var(--mono); font-size: 12px; cursor: pointer; transition: all 0.15s; }
   .page-btn:hover { color: var(--text); border-color: var(--accent); }
@@ -127,9 +129,11 @@
   .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
   .page-info { font-size: 12px; color: var(--muted); }
 
+  /* Filters */
   .filters { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
   .filters select, .filters input { width: auto; padding: 7px 12px; font-size: 12px; }
 
+  /* Alerts */
   .alert { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
   .alert.error   { background: rgba(255,106,142,0.1); border: 1px solid rgba(255,106,142,0.3); color: var(--error); }
   .alert.success { background: rgba(74,222,128,0.1);  border: 1px solid rgba(74,222,128,0.3);  color: var(--success); }
@@ -137,17 +141,79 @@
 
   .empty-state { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
 
+  /* Team ID box */
   .team-box { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
   .team-id-text { font-size: 13px; color: var(--accent); word-break: break-all; }
 
+  /* Inline edit form */
   .edit-row { display: none; }
   .edit-row.open { display: table-row; }
   .edit-cell { padding: 12px; background: var(--surface2); border-bottom: 1px solid var(--border); }
   .edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
   .edit-actions { display: flex; gap: 8px; }
 
+  /* Copy button */
   .copy-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 12px; padding: 2px 6px; border-radius: 4px; transition: color 0.15s; }
   .copy-btn:hover { color: var(--accent); }
+
+  /* Custom datetime picker */
+  .dt-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .dt-wrap:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(124,106,255,0.1);
+  }
+  .dt-wrap:hover { border-color: var(--accent); }
+  .dt-text {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    user-select: none;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .dt-text.has-value { color: var(--text); }
+  .dt-icon {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 6px;
+    background: rgba(124,106,255,0.15);
+    border: 1px solid rgba(124,106,255,0.3);
+    color: var(--accent);
+    font-size: 14px;
+    flex-shrink: 0;
+    transition: background 0.15s, box-shadow 0.15s;
+    pointer-events: none;
+  }
+  .dt-wrap:hover .dt-icon {
+    background: rgba(124,106,255,0.28);
+    box-shadow: 0 0 8px rgba(124,106,255,0.35);
+  }
+  .dt-wrap input[type="datetime-local"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+  }
 </style>
 </head>
 <body>
@@ -181,18 +247,18 @@
       <div class="card">
         <div class="empty-state">
           You don't have a team yet.<br><br>
-          <button class="btn" onclick="showPage('team', document.querySelectorAll('.nav-item')[1])">Create a team →</button>
+          <button class="btn" onclick="showPage('team', document.querySelector('[onclick*=team]'))">
         </div>
       </div>
     </div>
     <div id="dash-content">
       <div class="stats-grid">
-        <div class="stat-card total">    <div class="stat-value" id="d-total">—</div>    <div class="stat-label">Total tasks</div></div>
-        <div class="stat-card completed"><div class="stat-value" id="d-completed">—</div> <div class="stat-label">Completed</div></div>
-        <div class="stat-card pending">  <div class="stat-value" id="d-pending">—</div>   <div class="stat-label">Pending</div></div>
+        <div class="stat-card total">    <div class="stat-value" id="d-total">—</div>   <div class="stat-label">Total tasks</div></div>
+        <div class="stat-card completed"><div class="stat-value" id="d-completed">—</div><div class="stat-label">Completed</div></div>
+        <div class="stat-card pending">  <div class="stat-value" id="d-pending">—</div>  <div class="stat-label">Pending</div></div>
         <div class="stat-card progress"> <div class="stat-value" id="d-inprogress">—</div><div class="stat-label">In progress</div></div>
-        <div class="stat-card overdue">  <div class="stat-value" id="d-overdue">—</div>   <div class="stat-label">Overdue</div></div>
-        <div class="stat-card members">  <div class="stat-value" id="d-members">—</div>   <div class="stat-label">Members</div></div>
+        <div class="stat-card overdue">  <div class="stat-value" id="d-overdue">—</div>  <div class="stat-label">Overdue</div></div>
+        <div class="stat-card members">  <div class="stat-value" id="d-members">—</div>  <div class="stat-label">Members</div></div>
       </div>
       <div class="card">
         <div class="card-title">Recent tasks</div>
@@ -243,28 +309,35 @@
       <div class="page-subtitle">Manage all team tasks</div>
     </div>
 
+    <!-- Create task -->
     <div class="card">
       <div class="card-title">
         <span>Create task</span>
-        <button class="btn btn-sm btn-ghost" id="create-toggle" data-open="false" onclick="toggleCreateForm()">+ New task</button>
+        <button class="btn btn-sm btn-ghost" onclick="toggleCreateForm()" id="create-toggle">+ New task</button>
       </div>
       <div id="create-form" style="display:none">
         <div id="create-alert" class="alert"></div>
         <div class="form-row">
           <div class="field"><label>Task name</label><input id="c-name" placeholder="e.g. Fix login bug"/></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div class="field"><label>Date</label><input type="date" id="c-date"/></div>
-            <div class="field"><label>Time</label><input type="time" id="c-time"/></div>
+          <div class="field"><label>Deadline</label>
+            <div class="dt-wrap">
+              <span class="dt-text" id="c-deadline-text">Pick date &amp; time</span>
+              <span class="dt-icon">📅</span>
+              <input type="datetime-local" id="c-deadline" onchange="onDtChange('c-deadline')"/>
+            </div>
           </div>
         </div>
         <div class="field"><label>Description</label><textarea id="c-desc" placeholder="Describe the task…"></textarea></div>
         <div class="field"><label>Assign to (optional)</label>
-          <select id="c-employee"><option value="">Unassigned</option></select>
+          <select id="c-employee">
+            <option value="">Unassigned</option>
+          </select>
         </div>
         <button class="btn" onclick="createTask()">Create task</button>
       </div>
     </div>
 
+    <!-- Task list -->
     <div class="card">
       <div class="card-title">All tasks</div>
       <div class="filters">
@@ -311,7 +384,7 @@
 const API = '';
 let currentTaskPage = 1;
 let currentMembersPage = 1;
-let teamMembers = [];
+let teamMembers = []; // cached for task assignment dropdowns
 
 function getToken() { return localStorage.getItem('access_token'); }
 
@@ -326,8 +399,11 @@ async function apiFetch(path, options = {}) {
 }
 
 async function fullInit() {
-  if (!getToken()) return window.location.href = '/frontend/index.html';
+  const token = getToken();
+  if (!token) return window.location.href = '/frontend/index.html';
+
   document.getElementById('user-email').textContent = localStorage.getItem('user_email') || '—';
+
   await loadDashboard();
 }
 
@@ -360,6 +436,7 @@ async function loadDashboard() {
   document.getElementById('d-overdue').textContent   = d.overdue;
   document.getElementById('d-members').textContent   = d.total_members;
 
+  // Recent tasks
   const res2 = await apiFetch('/api/v1/manager/tasks?page=1&limit=5');
   const el = document.getElementById('dash-recent');
   if (!res2.ok) { el.innerHTML = `<div class="empty-state">No tasks yet.</div>`; return; }
@@ -377,6 +454,7 @@ async function loadDashboard() {
 async function loadTeam() {
   const content = document.getElementById('team-content');
   const res = await apiFetch('/api/v1/manager/team');
+
   if (res.status === 404) {
     content.innerHTML = `
       <div class="empty-state" style="padding:20px 0">
@@ -385,7 +463,9 @@ async function loadTeam() {
       </div>`;
     return;
   }
+
   if (!res.ok) { content.innerHTML = `<div class="empty-state">Error loading team.</div>`; return; }
+
   const data = await res.json();
   content.innerHTML = `
     <div class="team-box">
@@ -394,7 +474,7 @@ async function loadTeam() {
         <div class="team-id-text">${escHtml(String(data.team_id))}</div>
         <div style="font-size:11px;color:var(--muted);margin-top:6px">Created ${formatDate(data.created_at)}</div>
       </div>
-      <button class="btn btn-sm btn-ghost" onclick="copyTeamId('${escHtml(String(data.team_id))}')">⎘ Copy ID</button>
+      <button class="copy-btn btn btn-sm btn-ghost" onclick="copyTeamId('${escHtml(String(data.team_id))}')">⎘ Copy ID</button>
     </div>`;
 }
 
@@ -406,7 +486,7 @@ async function createTeam() {
     await loadDashboard();
   } else {
     const err = await res.json().catch(() => ({}));
-    showAlert('team-alert', extractErrorMessage(err, 'Failed to create team.'), 'error');
+    showAlert('team-alert', err.detail || 'Failed to create team.', 'error');
   }
 }
 
@@ -419,15 +499,16 @@ async function loadMembers(page) {
   currentMembersPage = page;
   const tbody = document.getElementById('members-tbody');
   const res = await apiFetch(`/api/v1/manager/team/members?page=${page}&limit=10`);
+
   if (res.status === 404) {
     tbody.innerHTML = `<tr><td colspan="3"><div class="empty-state">Create a team first.</div></td></tr>`;
     document.getElementById('members-pagination').innerHTML = '';
     return;
   }
-  if (!res.ok) return;
+  if (!res.ok) { return; }
 
   const data = await res.json();
-  teamMembers = data.members;
+  teamMembers = data.members; // cache for dropdowns
 
   if (!data.members.length) {
     tbody.innerHTML = `<tr><td colspan="3"><div class="empty-state">No members yet. Share your team ID for employees to join.</div></td></tr>`;
@@ -435,7 +516,9 @@ async function loadMembers(page) {
     tbody.innerHTML = data.members.map(m => `<tr>
       <td>${escHtml(m.email)}</td>
       <td style="font-size:11px;color:var(--muted)">${escHtml(String(m.id))}</td>
-      <td><button class="btn btn-sm btn-danger" onclick="removeMember('${m.id}', '${escHtml(m.email)}')">Remove</button></td>
+      <td>
+        <button class="btn btn-sm btn-danger" onclick="removeMember('${m.id}', '${escHtml(m.email)}')">Remove</button>
+      </td>
     </tr>`).join('');
   }
 
@@ -451,7 +534,7 @@ async function removeMember(employeeId, email) {
     loadMembers(currentMembersPage);
   } else {
     const err = await res.json().catch(() => ({}));
-    showAlert('members-alert', extractErrorMessage(err, 'Failed to remove member.'), 'error');
+    showAlert('members-alert', err.detail || 'Failed to remove member.', 'error');
   }
 }
 
@@ -462,34 +545,36 @@ async function loadMembersForDropdowns() {
   const data = await res.json();
   teamMembers = data.members;
 
+  // Populate create form dropdown
   const cEl = document.getElementById('c-employee');
   const fEl = document.getElementById('tf-employee');
+  const members = data.members;
+
   cEl.innerHTML = '<option value="">Unassigned</option>' +
-    data.members.map(m => `<option value="${m.id}">${escHtml(m.email)}</option>`).join('');
+    members.map(m => `<option value="${m.id}">${escHtml(m.email)}</option>`).join('');
+
   fEl.innerHTML = '<option value="">All employees</option>' +
-    data.members.map(m => `<option value="${m.id}">${escHtml(m.email)}</option>`).join('');
+    members.map(m => `<option value="${m.id}">${escHtml(m.email)}</option>`).join('');
 }
 
 function toggleCreateForm() {
   const f = document.getElementById('create-form');
   const btn = document.getElementById('create-toggle');
-  const isOpen = btn.dataset.open === 'true';
-  f.style.display = isOpen ? 'none' : 'block';
-  btn.dataset.open = isOpen ? 'false' : 'true';
-  btn.textContent = isOpen ? '+ New task' : '✕ Cancel';
+  const open = f.style.display === 'none';
+  f.style.display = open ? 'block' : 'none';
+  if (open) attachDatePickers();
+  btn.textContent = open ? '✕ Cancel' : '+ New task';
 }
 
 async function createTask() {
   const name = document.getElementById('c-name').value.trim();
   const desc = document.getElementById('c-desc').value.trim();
-  const date = document.getElementById('c-date').value;
-  const time = document.getElementById('c-time').value;
+  const deadline = document.getElementById('c-deadline').value;
   const employeeId = document.getElementById('c-employee').value;
 
-  if (!name || !desc || !date || !time) return showAlert('create-alert', 'Fill in all required fields.', 'error');
+  if (!name || !desc || !deadline) return showAlert('create-alert', 'Fill in all required fields.', 'error');
 
-  const deadline = new Date(`${date}T${time}`).toISOString();
-  const body = { taskname: name, task_description: desc, deadline };
+  const body = { taskname: name, task_description: desc, deadline: new Date(deadline).toISOString() };
   if (employeeId) body.employee_id = employeeId;
 
   const res = await apiFetch('/api/v1/manager/tasks', { method: 'POST', body: JSON.stringify(body) });
@@ -497,14 +582,13 @@ async function createTask() {
     showAlert('create-alert', 'Task created!', 'success');
     document.getElementById('c-name').value = '';
     document.getElementById('c-desc').value = '';
-    document.getElementById('c-date').value = '';
-    document.getElementById('c-time').value = '';
+    document.getElementById('c-deadline').value = '';
     document.getElementById('c-employee').value = '';
     loadTasks(1);
     loadDashboard();
   } else {
     const err = await res.json().catch(() => ({}));
-    showAlert('create-alert', extractErrorMessage(err, 'Failed to create task.'), 'error');
+    showAlert('create-alert', err.detail || 'Failed to create task.', 'error');
   }
 }
 
@@ -528,6 +612,7 @@ async function loadTasks(page) {
   if (!res.ok) return;
 
   const data = await res.json();
+
   if (!data.tasks.length) {
     tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">No tasks found.</div></td></tr>`;
     document.getElementById('tasks-pagination').innerHTML = '';
@@ -540,7 +625,7 @@ async function loadTasks(page) {
       ? `<span class="badge badge-overdue">overdue</span>`
       : `<span class="badge badge-${t.status}">${t.status.replace('_',' ')}</span>`;
     const assignedEmail = t.employee_id
-      ? (teamMembers.find(m => String(m.id) === String(t.employee_id))?.email || t.employee_id.toString().substring(0,8) + '…')
+      ? (teamMembers.find(m => m.id === t.employee_id)?.email || t.employee_id.substring(0,8) + '…')
       : '—';
     return `
       <tr id="row-${t.id}">
@@ -562,8 +647,7 @@ async function loadTasks(page) {
         <td colspan="5" class="edit-cell">
           <div class="edit-grid">
             <div class="field" style="margin:0"><label>Task name</label><input id="e-name-${t.id}" value="${escHtml(t.taskname)}"/></div>
-            <div class="field" style="margin:0"><label>Date</label><input type="date" id="e-date-${t.id}" value="${toDateString(t.deadline)}"/></div>
-            <div class="field" style="margin:0"><label>Time</label><input type="time" id="e-time-${t.id}" value="${toTimeString(t.deadline)}"/></div>
+            <div class="field" style="margin:0"><label>Deadline</label>${dtPickerHTML(`e-deadline-${t.id}`, toLocalDatetime(t.deadline))}</div>
             <div class="field" style="margin:0"><label>Description</label><input id="e-desc-${t.id}" value="${escHtml(t.task_description)}"/></div>
             <div class="field" style="margin:0"><label>Status</label>
               <select id="e-status-${t.id}">
@@ -574,8 +658,8 @@ async function loadTasks(page) {
             </div>
             <div class="field" style="margin:0"><label>Assign to</label>
               <select id="e-employee-${t.id}">
-                <option value="__unassign__" ${!t.employee_id?'selected':''}>— Unassigned —</option>
-                ${teamMembers.map(m => `<option value="${m.id}" ${String(t.employee_id)===String(m.id)?'selected':''}>${escHtml(m.email)}</option>`).join('')}
+                <option value="">Unassigned</option>
+                ${teamMembers.map(m => `<option value="${m.id}" ${t.employee_id===m.id?'selected':''}>${escHtml(m.email)}</option>`).join('')}
               </select>
             </div>
           </div>
@@ -586,42 +670,33 @@ async function loadTasks(page) {
         </td>
       </tr>`;
   }).join('');
-
+  attachDatePickers();
   const totalPages = Math.ceil(data.total / 10) || 1;
   renderPagination('tasks-pagination', page, totalPages, loadTasks);
 }
 
 function toggleEditRow(taskId) {
-  document.getElementById(`edit-${taskId}`).classList.toggle('open');
+  const row = document.getElementById(`edit-${taskId}`);
+  row.classList.toggle('open');
 }
 
 async function saveTask(taskId) {
-  const date = document.getElementById(`e-date-${taskId}`).value;
-  const time = document.getElementById(`e-time-${taskId}`).value;
-  const employeeVal = document.getElementById(`e-employee-${taskId}`).value;
-
   const body = {
     taskname:         document.getElementById(`e-name-${taskId}`).value.trim(),
     task_description: document.getElementById(`e-desc-${taskId}`).value.trim(),
-    deadline:         new Date(`${date}T${time}`).toISOString(),
+    deadline:         new Date(document.getElementById(`e-deadline-${taskId}`).value).toISOString(),
     status:           document.getElementById(`e-status-${taskId}`).value,
+    employee_id:      document.getElementById(`e-employee-${taskId}`).value || null,
   };
-
-  if (employeeVal === '__unassign__') {
-    body.unassign_employee = true;
-  } else {
-    body.employee_id = employeeVal || null;
-  }
 
   const res = await apiFetch(`/api/v1/manager/tasks/${taskId}`, { method: 'PATCH', body: JSON.stringify(body) });
   if (res.ok) {
     showAlert('tasks-alert', 'Task updated.', 'success');
-    document.getElementById(`edit-${taskId}`).classList.remove('open');
     loadTasks(currentTaskPage);
     loadDashboard();
   } else {
     const err = await res.json().catch(() => ({}));
-    showAlert('tasks-alert', extractErrorMessage(err, 'Failed to update task.'), 'error');
+    showAlert('tasks-alert', err.detail || 'Failed to update task.', 'error');
   }
 }
 
@@ -634,7 +709,7 @@ async function deleteTask(taskId) {
     loadDashboard();
   } else {
     const err = await res.json().catch(() => ({}));
-    showAlert('tasks-alert', extractErrorMessage(err, 'Failed to delete task.'), 'error');
+    showAlert('tasks-alert', err.detail || 'Failed to delete task.', 'error');
   }
 }
 
@@ -643,48 +718,30 @@ async function changePassword() {
   const old = document.getElementById('old-pass').value;
   const nw = document.getElementById('new-pass').value;
   if (!old || !nw) return showAlert('settings-alert', 'Fill in both fields.', 'error');
-  const res = await apiFetch('/api/v1/manager/change-password', {
-    method: 'PATCH',
-    body: JSON.stringify({ old_password: old, new_password: nw })
-  });
+  const res = await apiFetch('/api/v1/manager/change-password', { method: 'PATCH', body: JSON.stringify({ old_password: old, new_password: nw }) });
   if (res.ok) {
     showAlert('settings-alert', 'Password updated.', 'success');
     document.getElementById('old-pass').value = '';
     document.getElementById('new-pass').value = '';
   } else {
     const err = await res.json().catch(() => ({}));
-    showAlert('settings-alert', extractErrorMessage(err, 'Failed to update password.'), 'error');
+    showAlert('settings-alert', err.detail || 'Failed.', 'error');
   }
 }
 
 // ── Logout ────────────────────────────────────────────────────────────────────
 async function handleLogout() {
   const refresh = localStorage.getItem('refresh_token');
-  if (refresh) {
-    await apiFetch('/api/v1/manager/logout', { method: 'POST', body: JSON.stringify({ refresh_token: refresh }) });
-  }
+  if (refresh) await apiFetch('/api/v1/manager/logout', { method: 'POST', body: JSON.stringify({ refresh_token: refresh }) });
   localStorage.clear();
   window.location.href = '/frontend/index.html';
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-function extractErrorMessage(err, defaultMsg = 'An error occurred') {
-  if (!err) return defaultMsg;
-  if (typeof err === 'string') return err;
-  if (err.detail && typeof err.detail === 'string') return err.detail;
-  if (err.message && typeof err.message === 'string') return err.message;
-  if (Array.isArray(err.detail) && err.detail.length > 0) {
-    const first = err.detail[0];
-    if (first.msg) return first.msg;
-  }
-  try { const s = JSON.stringify(err); if (s && s !== '{}' && s.length < 200) return s; } catch {}
-  return defaultMsg;
-}
-
 function showAlert(id, msg, type) {
   const el = document.getElementById(id);
   if (!el) return;
-  el.textContent = String(msg || 'An error occurred');
+  el.textContent = msg;
   el.className = `alert ${type} show`;
   setTimeout(() => el.className = 'alert', 4000);
 }
@@ -694,18 +751,11 @@ function formatDate(d) {
   return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
-function toDateString(d) {
+function toLocalDatetime(d) {
   if (!d) return '';
   const dt = new Date(d);
   const pad = n => String(n).padStart(2, '0');
-  return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`;
-}
-
-function toTimeString(d) {
-  if (!d) return '';
-  const dt = new Date(d);
-  const pad = n => String(n).padStart(2, '0');
-  return `${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+  return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}T${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
 }
 
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -725,6 +775,45 @@ function renderPagination(containerId, current, total, callback) {
   }
   html += `<button class="page-btn" ${current===total?'disabled':''} onclick="${callback.name}(${current+1})">→</button>`;
   el.innerHTML = html;
+}
+
+// ── Datetime picker helpers ───────────────────────────────────────────────────
+function dtPickerHTML(id, value) {
+  const display = value ? formatDate(new Date(value).toISOString()) : 'Pick date &amp; time';
+  const hasValue = value ? 'has-value' : '';
+  return `<div class="dt-wrap">
+    <span class="dt-text ${hasValue}" id="${id}-text">${display}</span>
+    <span class="dt-icon">📅</span>
+    <input type="datetime-local" id="${id}" value="${value || ''}" onchange="onDtChange('${id}')"/>
+  </div>`;
+}
+
+function onDtChange(id) {
+  const val = document.getElementById(id).value;
+  const span = document.getElementById(`${id}-text`);
+  if (!span) return;
+  if (val) {
+    span.textContent = formatDate(new Date(val).toISOString());
+    span.classList.add('has-value');
+  } else {
+    span.textContent = 'Pick date & time';
+    span.classList.remove('has-value');
+  }
+}
+
+function attachDatePickers() {
+  document.querySelectorAll('.dt-wrap').forEach(wrap => {
+    const input = wrap.querySelector('input');
+
+    wrap.onclick = () => {
+      input.blur();              // reset focus
+      if (input.showPicker) {
+        input.showPicker();      // Chrome fix
+      } else {
+        input.click();           // fallback
+      }
+    };
+  });
 }
 
 fullInit();
