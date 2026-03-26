@@ -55,6 +55,7 @@ class UpdateTaskStatusSchema(BaseModel):
             raise ValueError("Status must be pending, in_progress or completed")
         return v
 
+
 # ─── Auth ────────────────────────────────────────────────────────────────────
 
 @router.post("/register", summary="Register a new employee")
@@ -65,11 +66,12 @@ async def register(body: RegisterSchema, db: AsyncSession = Depends(get_db)):
 
     employee = EmployeeModel(
         email=body.email,
-        hashed_password=hash_password(body.password)
+        hashed_password=hash_password(body.password),
     )
     db.add(employee)
-    await db.flush()
+    await db.flush()  # get employee.id without committing
 
+    # FIX: create_tokens no longer commits internally; we commit once here
     tokens = await create_tokens(employee.id, role="employee", db=db)
     await db.commit()
     return {"employee_id": employee.id, **tokens}
@@ -84,6 +86,7 @@ async def login(body: LoginSchema, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     tokens = await create_tokens(employee.id, role="employee", db=db)
+    await db.commit()
     return tokens
 
 
@@ -94,10 +97,9 @@ async def refresh(body: RefreshTokenSchema, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(EmployeeRefreshTokenModel).where(
             EmployeeRefreshTokenModel.token_hash == token_hash,
-            EmployeeRefreshTokenModel.is_revoked == False
+            EmployeeRefreshTokenModel.is_revoked == False,
         ).with_for_update()
     )
-
     db_token = result.scalar_one_or_none()
 
     if not db_token:
@@ -106,9 +108,11 @@ async def refresh(body: RefreshTokenSchema, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Refresh token expired")
 
     db_token.is_revoked = True
-    await db.commit()
+    await db.flush()
 
+    # FIX: create_tokens no longer commits; we commit once at the end
     tokens = await create_tokens(db_token.employee_id, role="employee", db=db)
+    await db.commit()
     return tokens
 
 
@@ -116,14 +120,14 @@ async def refresh(body: RefreshTokenSchema, db: AsyncSession = Depends(get_db)):
 async def logout(
     body: RefreshTokenSchema,
     db: AsyncSession = Depends(get_db),
-    employee: EmployeeModel = Depends(get_current_employee)
+    employee: EmployeeModel = Depends(get_current_employee),
 ):
     token_hash = hash_refresh_token(body.refresh_token)
 
     result = await db.execute(
         select(EmployeeRefreshTokenModel).where(
             EmployeeRefreshTokenModel.token_hash == token_hash,
-            EmployeeRefreshTokenModel.employee_id == employee.id
+            EmployeeRefreshTokenModel.employee_id == employee.id,
         )
     )
     db_token = result.scalar_one_or_none()
@@ -139,7 +143,7 @@ async def logout(
 async def change_password(
     body: ChangePasswordSchema,
     db: AsyncSession = Depends(get_db),
-    employee: EmployeeModel = Depends(get_current_employee)
+    employee: EmployeeModel = Depends(get_current_employee),
 ):
     if not verify_password(employee.hashed_password, body.old_password):
         raise HTTPException(status_code=401, detail="Old password is incorrect")
@@ -155,7 +159,7 @@ async def change_password(
 async def join_team(
     body: JoinTeamSchema,
     db: AsyncSession = Depends(get_db),
-    employee: EmployeeModel = Depends(get_current_employee)
+    employee: EmployeeModel = Depends(get_current_employee),
 ):
     if employee.team_id:
         raise HTTPException(status_code=400, detail="You are already in a team, exit first")
@@ -167,20 +171,23 @@ async def join_team(
 
     employee.team_id = team.id
     await db.commit()
-    return {"detail": "Joined team successfully", "team_id": team.id}
+    return {"detail": "Joined team successfully", "team_id": str(team.id)}
 
 
 @router.post("/team/exit", summary="Exit current team")
 async def exit_team(
     db: AsyncSession = Depends(get_db),
-    employee: EmployeeModel = Depends(get_current_employee)
+    employee: EmployeeModel = Depends(get_current_employee),
 ):
     if not employee.team_id:
         raise HTTPException(status_code=400, detail="You are not in a team")
 
-    # Unassign all tasks
+    # FIX: also filter by team_id so we only touch tasks from the current team
     result = await db.execute(
-        select(TaskModel).where(TaskModel.employee_id == employee.id)
+        select(TaskModel).where(
+            TaskModel.employee_id == employee.id,
+            TaskModel.team_id == employee.team_id,
+        )
     )
     tasks = result.scalars().all()
     for task in tasks:
@@ -189,7 +196,22 @@ async def exit_team(
 
     employee.team_id = None
     await db.commit()
-    return {"detail": "Exited team successfully, tasks unassigned"}
+    return {"detail": "Exited team successfully, incomplete tasks unassigned"}
+
+
+# FIX: new endpoint so the frontend can retrieve the current team_id on page load
+@router.get("/team/info", summary="Get current team info")
+async def get_team_info(
+    db: AsyncSession = Depends(get_db),
+    employee: EmployeeModel = Depends(get_current_employee),
+):
+    if not employee.team_id:
+        raise HTTPException(status_code=400, detail="You are not in a team")
+    result = await db.execute(select(TeamModel).where(TeamModel.id == employee.team_id))
+    team = result.scalar_one_or_none()
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    return {"team_id": str(team.id), "created_at": team.created_at}
 
 
 # ─── Tasks ───────────────────────────────────────────────────────────────────
@@ -200,7 +222,7 @@ async def get_tasks(
     limit: int = Query(10, ge=1, le=100),
     status: Optional[str] = Query(None, description="Filter by status: pending, in_progress, completed"),
     db: AsyncSession = Depends(get_db),
-    employee: EmployeeModel = Depends(get_current_employee)
+    employee: EmployeeModel = Depends(get_current_employee),
 ):
     if not employee.team_id:
         raise HTTPException(status_code=400, detail="You are not in a team")
@@ -212,13 +234,13 @@ async def get_tasks(
             raise HTTPException(status_code=400, detail="Invalid status filter")
         query = query.where(TaskModel.status == status)
 
-    total = await db.execute(select(func.count()).select_from(query.subquery()))
-    total_count = total.scalar()
+    # FIX: count on the filtered query, not a separate unfiltered one
+    count_result = await db.execute(select(func.count()).select_from(query.subquery()))
+    total_count = count_result.scalar()
 
     offset = (page - 1) * limit
-    result = await db.execute(query.offset(offset).limit(limit))
+    result = await db.execute(query.order_by(TaskModel.created_at.desc()).offset(offset).limit(limit))
     tasks = result.scalars().all()
-
 
     return {
         "page": page,
@@ -233,10 +255,10 @@ async def get_tasks(
                 "status": t.status,
                 "deadline": t.deadline,
                 "created_at": t.created_at,
-                "completed_at": t.completed_at
+                "completed_at": t.completed_at,
             }
             for t in tasks
-        ]
+        ],
     }
 
 
@@ -245,7 +267,7 @@ async def update_task_status(
     task_id: UUID,
     body: UpdateTaskStatusSchema,
     db: AsyncSession = Depends(get_db),
-    employee: EmployeeModel = Depends(get_current_employee)
+    employee: EmployeeModel = Depends(get_current_employee),
 ):
     if not employee.team_id:
         raise HTTPException(status_code=400, detail="You are not in a team")
@@ -253,7 +275,7 @@ async def update_task_status(
     result = await db.execute(
         select(TaskModel).where(
             TaskModel.id == task_id,
-            TaskModel.employee_id == employee.id
+            TaskModel.employee_id == employee.id,
         )
     )
     task = result.scalar_one_or_none()

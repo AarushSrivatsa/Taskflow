@@ -13,7 +13,8 @@ class EmployeeModel(Base):
     hashed_password = Column(String, nullable=False)
     team_id = Column(UUID(as_uuid=True), ForeignKey("team.id", ondelete="SET NULL"), nullable=True, index=True)
     team = relationship("TeamModel", back_populates="members")
-    tasks = relationship("TaskModel", back_populates="members")
+    # FIX: was back_populates="members" which conflicted with TaskModel.members name
+    tasks = relationship("TaskModel", back_populates="assigned_employee")
 
 
 class ManagerModel(Base):
@@ -21,7 +22,7 @@ class ManagerModel(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
-    team = relationship("TeamModel", back_populates="manager", uselist=False)  # ← one team per manager
+    team = relationship("TeamModel", back_populates="manager", uselist=False)
     tasks = relationship("TaskModel", back_populates="manager")
 
 
@@ -40,14 +41,15 @@ class TaskModel(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     taskname = Column(String, nullable=False)
     task_description = Column(String, nullable=False)
-    status = Column(String, default="pending", nullable=False)  # ← pending, in_progress, completed
+    status = Column(String, default="pending", nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     completed_at = Column(DateTime(timezone=True), nullable=True)
     deadline = Column(DateTime(timezone=True), nullable=False)
     manager_id = Column(UUID(as_uuid=True), ForeignKey("manager.id", ondelete="CASCADE"), nullable=False, index=True)
     manager = relationship("ManagerModel", back_populates="tasks")
+    # FIX: renamed from "members" to "assigned_employee" to match EmployeeModel.tasks back_populates
     employee_id = Column(UUID(as_uuid=True), ForeignKey("employee.id", ondelete="SET NULL"), nullable=True, index=True)
-    members = relationship("EmployeeModel", back_populates="tasks")
+    assigned_employee = relationship("EmployeeModel", back_populates="tasks")
     team_id = Column(UUID(as_uuid=True), ForeignKey("team.id", ondelete="CASCADE"), nullable=False, index=True)
     team = relationship("TeamModel", back_populates="tasks")
 

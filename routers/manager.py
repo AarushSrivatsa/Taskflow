@@ -1,5 +1,3 @@
-import re
-
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
@@ -27,12 +25,15 @@ class RegisterSchema(BaseModel):
             raise ValueError("Password must be at least 8 characters")
         return v
 
+
 class LoginSchema(BaseModel):
     email: EmailStr
     password: str
 
+
 class RefreshTokenSchema(BaseModel):
     refresh_token: str
+
 
 class ChangePasswordSchema(BaseModel):
     old_password: str
@@ -43,6 +44,7 @@ class ChangePasswordSchema(BaseModel):
         if len(v) < 8:
             raise ValueError("Password must be at least 8 characters")
         return v
+
 
 class CreateTaskSchema(BaseModel):
     taskname: str
@@ -56,22 +58,34 @@ class CreateTaskSchema(BaseModel):
             raise ValueError("Task name must be at least 3 characters")
         return v.strip()
 
+    # FIX: was raising HTTPException inside a Pydantic validator — must raise ValueError
     @field_validator("deadline")
     def validate_deadline(cls, v):
+        if v.tzinfo is None:
+            v = v.replace(tzinfo=timezone.utc)
         if v < datetime.now(tz=timezone.utc):
-            raise HTTPException("Deadline cannot be in the past")
+            raise ValueError("Deadline cannot be in the past")
         return v
+
 
 class UpdateTaskSchema(BaseModel):
     taskname: Optional[str] = None
     task_description: Optional[str] = None
     deadline: Optional[datetime] = None
+    # FIX: use a sentinel so we can distinguish "not provided" vs "explicitly null"
+    # We keep Optional[UUID] but handle unassign via a separate flag approach:
+    # employee_id=None means "don't touch", so we add unassign_employee bool
     employee_id: Optional[UUID] = None
+    unassign_employee: bool = False
     status: Optional[Literal["pending", "in_progress", "completed"]] = None
 
     @field_validator("deadline")
     def validate_deadline(cls, v):
-        if v and v < datetime.now(tz=timezone.utc):
+        if v is None:
+            return v
+        if v.tzinfo is None:
+            v = v.replace(tzinfo=timezone.utc)
+        if v < datetime.now(tz=timezone.utc):
             raise ValueError("Deadline cannot be in the past")
         return v
 
@@ -86,15 +100,14 @@ async def register(body: RegisterSchema, db: AsyncSession = Depends(get_db)):
 
     manager = ManagerModel(
         email=body.email,
-        hashed_password=hash_password(body.password)
+        hashed_password=hash_password(body.password),
     )
     db.add(manager)
-    await db.flush()
+    await db.flush()  # get manager.id
 
+    # FIX: create_tokens no longer commits; single commit here
     tokens = await create_tokens(manager.id, role="manager", db=db)
-
     await db.commit()
-
     return {"manager_id": manager.id, **tokens}
 
 
@@ -107,6 +120,7 @@ async def login(body: LoginSchema, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     tokens = await create_tokens(manager.id, role="manager", db=db)
+    await db.commit()
     return tokens
 
 
@@ -117,10 +131,9 @@ async def refresh(body: RefreshTokenSchema, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(ManagerRefreshTokenModel).where(
             ManagerRefreshTokenModel.token_hash == token_hash,
-            ManagerRefreshTokenModel.is_revoked == False
+            ManagerRefreshTokenModel.is_revoked == False,
         ).with_for_update()
     )
-
     db_token = result.scalar_one_or_none()
 
     if not db_token:
@@ -129,23 +142,26 @@ async def refresh(body: RefreshTokenSchema, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Refresh token expired")
 
     db_token.is_revoked = True
-    await db.commit()
+    await db.flush()
 
+    # FIX: single commit after create_tokens
     tokens = await create_tokens(db_token.manager_id, role="manager", db=db)
+    await db.commit()
     return tokens
+
 
 @router.post("/logout", summary="Logout manager")
 async def logout(
     body: RefreshTokenSchema,
     db: AsyncSession = Depends(get_db),
-    manager: ManagerModel = Depends(get_current_manager)
+    manager: ManagerModel = Depends(get_current_manager),
 ):
     token_hash = hash_refresh_token(body.refresh_token)
 
     result = await db.execute(
         select(ManagerRefreshTokenModel).where(
             ManagerRefreshTokenModel.token_hash == token_hash,
-            ManagerRefreshTokenModel.manager_id == manager.id
+            ManagerRefreshTokenModel.manager_id == manager.id,
         )
     )
     db_token = result.scalar_one_or_none()
@@ -161,7 +177,7 @@ async def logout(
 async def change_password(
     body: ChangePasswordSchema,
     db: AsyncSession = Depends(get_db),
-    manager: ManagerModel = Depends(get_current_manager)
+    manager: ManagerModel = Depends(get_current_manager),
 ):
     if not verify_password(manager.hashed_password, body.old_password):
         raise HTTPException(status_code=401, detail="Old password is incorrect")
@@ -176,7 +192,7 @@ async def change_password(
 @router.post("/team", summary="Create a team")
 async def create_team(
     db: AsyncSession = Depends(get_db),
-    manager: ManagerModel = Depends(get_current_manager)
+    manager: ManagerModel = Depends(get_current_manager),
 ):
     result = await db.execute(select(TeamModel).where(TeamModel.manager_id == manager.id))
     if result.scalar_one_or_none():
@@ -192,13 +208,12 @@ async def create_team(
 @router.get("/team", summary="Get your team details and UUID")
 async def get_team(
     db: AsyncSession = Depends(get_db),
-    manager: ManagerModel = Depends(get_current_manager)
+    manager: ManagerModel = Depends(get_current_manager),
 ):
     result = await db.execute(select(TeamModel).where(TeamModel.manager_id == manager.id))
     team = result.scalar_one_or_none()
     if not team:
         raise HTTPException(status_code=404, detail="You don't have a team yet")
-
     return {"team_id": team.id, "created_at": team.created_at}
 
 
@@ -207,32 +222,33 @@ async def get_members(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
-    manager: ManagerModel = Depends(get_current_manager)
+    manager: ManagerModel = Depends(get_current_manager),
 ):
     result = await db.execute(select(TeamModel).where(TeamModel.manager_id == manager.id))
     team = result.scalar_one_or_none()
     if not team:
         raise HTTPException(status_code=404, detail="You don't have a team yet")
 
-    offset = (page - 1) * limit
-    result = await db.execute(
-        select(EmployeeModel)
-        .where(EmployeeModel.team_id == team.id)
-        .offset(offset)
-        .limit(limit)
-    )
-    members = result.scalars().all()
-
     total = await db.execute(
         select(func.count()).where(EmployeeModel.team_id == team.id)
     )
     total_count = total.scalar()
 
+    offset = (page - 1) * limit
+    result = await db.execute(
+        select(EmployeeModel)
+        .where(EmployeeModel.team_id == team.id)
+        .order_by(EmployeeModel.email)
+        .offset(offset)
+        .limit(limit)
+    )
+    members = result.scalars().all()
+
     return {
         "page": page,
         "limit": limit,
         "total": total_count,
-        "members": [{"id": m.id, "email": m.email} for m in members]
+        "members": [{"id": m.id, "email": m.email} for m in members],
     }
 
 
@@ -240,7 +256,7 @@ async def get_members(
 async def remove_member(
     employee_id: UUID,
     db: AsyncSession = Depends(get_db),
-    manager: ManagerModel = Depends(get_current_manager)
+    manager: ManagerModel = Depends(get_current_manager),
 ):
     result = await db.execute(select(TeamModel).where(TeamModel.manager_id == manager.id))
     team = result.scalar_one_or_none()
@@ -250,18 +266,17 @@ async def remove_member(
     result = await db.execute(
         select(EmployeeModel).where(
             EmployeeModel.id == employee_id,
-            EmployeeModel.team_id == team.id
+            EmployeeModel.team_id == team.id,
         )
     )
     employee = result.scalar_one_or_none()
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found in your team")
 
-    # Unassign all their tasks
     task_result = await db.execute(
         select(TaskModel).where(
             TaskModel.employee_id == employee_id,
-            TaskModel.team_id == team.id
+            TaskModel.team_id == team.id,
         )
     )
     tasks = task_result.scalars().all()
@@ -271,7 +286,7 @@ async def remove_member(
 
     employee.team_id = None
     await db.commit()
-    return {"detail": "Member removed and tasks unassigned"}
+    return {"detail": "Member removed and incomplete tasks unassigned"}
 
 
 # ─── Tasks ───────────────────────────────────────────────────────────────────
@@ -280,19 +295,18 @@ async def remove_member(
 async def create_task(
     body: CreateTaskSchema,
     db: AsyncSession = Depends(get_db),
-    manager: ManagerModel = Depends(get_current_manager)
+    manager: ManagerModel = Depends(get_current_manager),
 ):
     result = await db.execute(select(TeamModel).where(TeamModel.manager_id == manager.id))
     team = result.scalar_one_or_none()
     if not team:
         raise HTTPException(status_code=404, detail="You don't have a team yet")
 
-    # Validate employee belongs to manager's team
     if body.employee_id:
         result = await db.execute(
             select(EmployeeModel).where(
                 EmployeeModel.id == body.employee_id,
-                EmployeeModel.team_id == team.id
+                EmployeeModel.team_id == team.id,
             )
         )
         if not result.scalar_one_or_none():
@@ -304,7 +318,7 @@ async def create_task(
         deadline=body.deadline,
         employee_id=body.employee_id,
         manager_id=manager.id,
-        team_id=team.id
+        team_id=team.id,
     )
     db.add(task)
     await db.commit()
@@ -319,7 +333,7 @@ async def get_tasks(
     status: Optional[str] = Query(None, description="Filter by status: pending, in_progress, completed"),
     employee_id: Optional[UUID] = Query(None, description="Filter by assigned employee"),
     db: AsyncSession = Depends(get_db),
-    manager: ManagerModel = Depends(get_current_manager)
+    manager: ManagerModel = Depends(get_current_manager),
 ):
     result = await db.execute(select(TeamModel).where(TeamModel.manager_id == manager.id))
     team = result.scalar_one_or_none()
@@ -336,13 +350,11 @@ async def get_tasks(
     if employee_id:
         query = query.where(TaskModel.employee_id == employee_id)
 
-    total = await db.execute(
-        select(func.count()).select_from(query.subquery())
-    )
+    total = await db.execute(select(func.count()).select_from(query.subquery()))
     total_count = total.scalar()
 
     offset = (page - 1) * limit
-    result = await db.execute(query.offset(offset).limit(limit))
+    result = await db.execute(query.order_by(TaskModel.created_at.desc()).offset(offset).limit(limit))
     tasks = result.scalars().all()
 
     return {
@@ -358,10 +370,10 @@ async def get_tasks(
                 "deadline": t.deadline,
                 "employee_id": t.employee_id,
                 "created_at": t.created_at,
-                "completed_at": t.completed_at
+                "completed_at": t.completed_at,
             }
             for t in tasks
-        ]
+        ],
     }
 
 
@@ -370,7 +382,7 @@ async def update_task(
     task_id: UUID,
     body: UpdateTaskSchema,
     db: AsyncSession = Depends(get_db),
-    manager: ManagerModel = Depends(get_current_manager)
+    manager: ManagerModel = Depends(get_current_manager),
 ):
     result = await db.execute(select(TeamModel).where(TeamModel.manager_id == manager.id))
     team = result.scalar_one_or_none()
@@ -384,11 +396,12 @@ async def update_task(
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
 
-    if body.employee_id:
+    # FIX: validate new employee only if we're assigning one
+    if body.employee_id is not None:
         result = await db.execute(
             select(EmployeeModel).where(
                 EmployeeModel.id == body.employee_id,
-                EmployeeModel.team_id == team.id
+                EmployeeModel.team_id == team.id,
             )
         )
         if not result.scalar_one_or_none():
@@ -400,8 +413,13 @@ async def update_task(
         task.task_description = body.task_description
     if body.deadline is not None:
         task.deadline = body.deadline
-    if body.employee_id is not None:
+
+    # FIX: support explicit unassign via unassign_employee=true
+    if body.unassign_employee:
+        task.employee_id = None
+    elif body.employee_id is not None:
         task.employee_id = body.employee_id
+
     if body.status is not None:
         task.status = body.status
         if body.status == "completed" and not task.completed_at:
@@ -417,7 +435,7 @@ async def update_task(
 async def delete_task(
     task_id: UUID,
     db: AsyncSession = Depends(get_db),
-    manager: ManagerModel = Depends(get_current_manager)
+    manager: ManagerModel = Depends(get_current_manager),
 ):
     result = await db.execute(select(TeamModel).where(TeamModel.manager_id == manager.id))
     team = result.scalar_one_or_none()
@@ -435,12 +453,13 @@ async def delete_task(
     await db.commit()
     return {"detail": "Task deleted"}
 
+
 # ─── Dashboard ───────────────────────────────────────────────────────────────
 
 @router.get("/dashboard", summary="Get team task stats")
 async def dashboard(
     db: AsyncSession = Depends(get_db),
-    manager: ManagerModel = Depends(get_current_manager)
+    manager: ManagerModel = Depends(get_current_manager),
 ):
     result = await db.execute(select(TeamModel).where(TeamModel.manager_id == manager.id))
     team = result.scalar_one_or_none()
@@ -449,24 +468,24 @@ async def dashboard(
 
     now = datetime.now(tz=timezone.utc)
 
-    total = await db.execute(select(func.count()).where(TaskModel.team_id == team.id))
-    completed = await db.execute(select(func.count()).where(TaskModel.team_id == team.id, TaskModel.status == "completed"))
-    pending = await db.execute(select(func.count()).where(TaskModel.team_id == team.id, TaskModel.status == "pending"))
+    total      = await db.execute(select(func.count()).where(TaskModel.team_id == team.id))
+    completed  = await db.execute(select(func.count()).where(TaskModel.team_id == team.id, TaskModel.status == "completed"))
+    pending    = await db.execute(select(func.count()).where(TaskModel.team_id == team.id, TaskModel.status == "pending"))
     in_progress = await db.execute(select(func.count()).where(TaskModel.team_id == team.id, TaskModel.status == "in_progress"))
-    overdue = await db.execute(
+    overdue    = await db.execute(
         select(func.count()).where(
             TaskModel.team_id == team.id,
             TaskModel.deadline < now,
-            TaskModel.status != "completed"
+            TaskModel.status != "completed",
         )
     )
     members = await db.execute(select(func.count()).where(EmployeeModel.team_id == team.id))
 
     return {
-        "total_tasks": total.scalar(),
-        "completed": completed.scalar(),
-        "pending": pending.scalar(),
-        "in_progress": in_progress.scalar(),
-        "overdue": overdue.scalar(),
-        "total_members": members.scalar()
+        "total_tasks":   total.scalar(),
+        "completed":     completed.scalar(),
+        "pending":       pending.scalar(),
+        "in_progress":   in_progress.scalar(),
+        "overdue":       overdue.scalar(),
+        "total_members": members.scalar(),
     }

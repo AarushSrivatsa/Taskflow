@@ -36,12 +36,10 @@
 
   .logo { font-family: var(--sans); font-size: 20px; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding: 0 8px; }
   .logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); animation: pulse 2s ease-in-out infinite; }
-
   @keyframes pulse { 0%,100% { box-shadow: 0 0 10px var(--accent); } 50% { box-shadow: 0 0 20px var(--accent); } }
 
   .role-badge { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); padding: 0 8px; margin-bottom: 32px; }
   .nav-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); padding: 0 8px; margin-bottom: 8px; }
-
   .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; cursor: pointer; color: var(--muted); font-size: 13px; transition: all 0.15s; margin-bottom: 2px; border: 1px solid transparent; }
   .nav-item:hover { color: var(--text); background: var(--surface2); }
   .nav-item.active { color: var(--accent); background: rgba(255,106,142,0.1); border-color: rgba(255,106,142,0.2); }
@@ -49,12 +47,10 @@
 
   .sidebar-bottom { margin-top: auto; border-top: 1px solid var(--border); padding-top: 16px; }
   .user-email { font-size: 11px; color: var(--muted); padding: 0 8px; margin-bottom: 10px; word-break: break-all; }
-
   .logout-btn { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--error); font-family: var(--mono); font-size: 12px; cursor: pointer; transition: all 0.15s; text-align: left; display: flex; align-items: center; gap: 8px; }
   .logout-btn:hover { background: rgba(255,106,142,0.08); border-color: rgba(255,106,142,0.3); }
 
   .main { margin-left: 220px; flex: 1; padding: 32px; min-height: 100vh; }
-
   .page { display: none; }
   .page.active { display: block; animation: fadeIn 0.3s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -79,43 +75,10 @@
 
   .field { margin-bottom: 14px; }
   label { display: block; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-
-  input, select {
-    width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
-    padding: 10px 12px; color: var(--text); font-family: var(--mono); font-size: 13px;
-    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
-  }
+  input, select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-family: var(--mono); font-size: 13px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
   input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,106,142,0.1); }
   input::placeholder { color: var(--muted); }
   select option { background: var(--surface); }
-  
-  input[type="date"], input[type="time"] {
-    cursor: pointer;
-  }
-  input[type="date"][readonly], input[type="time"][readonly] {
-    cursor: pointer;
-    background-color: rgba(255,106,142,0.05);
-  }
-  input[type="date"] {
-    padding-right: 30px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b6b8a' stroke-width='2'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 18px;
-  }
-  input[type="date"]:focus {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23ff6a8e' stroke-width='2'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E");
-  }
-  input[type="time"] {
-    padding-right: 30px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b6b8a' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpolyline points='12 6 12 12 16 14'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 18px;
-  }
-  input[type="time"]:focus {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23ff6a8e' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpolyline points='12 6 12 12 16 14'/%3E%3C/svg%3E");
-  }
 
   .btn { padding: 10px 18px; border: none; border-radius: 8px; background: var(--accent); color: #fff; font-family: var(--mono); font-size: 13px; cursor: pointer; transition: all 0.15s; }
   .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
@@ -222,6 +185,7 @@
         </select>
         <button class="btn btn-sm btn-ghost" onclick="loadTasks(1)">Refresh</button>
       </div>
+      <div id="tasks-alert" class="alert"></div>
       <div style="overflow-x:auto">
         <table>
           <thead><tr><th>Task</th><th>Status</th><th>Deadline</th><th>Update</th></tr></thead>
@@ -273,10 +237,10 @@
 <script>
 const API = '';
 let currentTaskPage = 1;
+// FIX: in-memory team state, synced from server on load
+let currentTeamId = null;
 
 function getToken() { return localStorage.getItem('access_token'); }
-function getTeamId() { return localStorage.getItem('employee_team_id'); }
-function setTeamId(id) { id ? localStorage.setItem('employee_team_id', id) : localStorage.removeItem('employee_team_id'); }
 
 async function apiFetch(path, options = {}) {
   const token = getToken();
@@ -289,26 +253,28 @@ async function apiFetch(path, options = {}) {
 }
 
 async function fullInit() {
-  const token = getToken();
-  if (!token) return window.location.href = '/frontend/index.html';
-
-  // Show email from localStorage (saved at login)
-  const email = localStorage.getItem('user_email') || '—';
-  document.getElementById('user-email').textContent = email;
-
-  // Verify team membership and sync localStorage
+  if (!getToken()) return window.location.href = '/frontend/index.html';
+  document.getElementById('user-email').textContent = localStorage.getItem('user_email') || '—';
+  // FIX: check team membership from server (not localStorage) so it survives page refreshes
   await syncTeamStatus();
   await loadDashboard();
 }
 
-// Check if still in a team by hitting tasks endpoint
+// FIX: properly detect and save team membership by calling the tasks endpoint
+// A 200 means we're in a team; a 400 means we're not.
 async function syncTeamStatus() {
   const res = await apiFetch('/api/v1/employee/tasks?page=1&limit=1');
-  if (res.status === 400) {
-    // Not in a team — clear any stale team_id
-    setTeamId(null);
+  if (res.ok) {
+    // We are in a team. We don't get team_id from this endpoint, but we only
+    // need it for display in the Team page, so we fetch it separately.
+    const teamRes = await apiFetch('/api/v1/employee/team/info');
+    if (teamRes.ok) {
+      const data = await teamRes.json();
+      currentTeamId = data.team_id;
+    }
+  } else {
+    currentTeamId = null;
   }
-  // If ok, team_id in localStorage (if any) is still valid
 }
 
 function showPage(name, el) {
@@ -322,23 +288,32 @@ function showPage(name, el) {
 }
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
+// FIX: use separate count queries instead of fetching all 100 tasks
 async function loadDashboard() {
-  const res = await apiFetch('/api/v1/employee/tasks?page=1&limit=100');
-  if (!res.ok) {
-    // Not in a team — show zeroed stats
+  // Get stats for all statuses using individual filtered requests
+  const [allRes, completedRes, pendingRes, inprogressRes] = await Promise.all([
+    apiFetch('/api/v1/employee/tasks?page=1&limit=1'),
+    apiFetch('/api/v1/employee/tasks?page=1&limit=1&status=completed'),
+    apiFetch('/api/v1/employee/tasks?page=1&limit=1&status=pending'),
+    apiFetch('/api/v1/employee/tasks?page=1&limit=1&status=in_progress'),
+  ]);
+
+  if (!allRes.ok) {
     ['stat-total','stat-completed','stat-pending','stat-inprogress'].forEach(id => document.getElementById(id).textContent = '0');
     document.getElementById('completion-label').textContent = 'Join a team to get started.';
     document.getElementById('progress-bar').style.width = '0%';
     document.getElementById('recent-tasks').innerHTML = `<div class="empty-state">No tasks assigned yet.</div>`;
     return;
   }
-  const data = await res.json();
-  const tasks = data.tasks || [];
 
-  const total = tasks.length;
-  const completed = tasks.filter(t => t.status === 'completed').length;
-  const pending = tasks.filter(t => t.status === 'pending').length;
-  const inprogress = tasks.filter(t => t.status === 'in_progress').length;
+  const [allData, completedData, pendingData, inprogressData] = await Promise.all([
+    allRes.json(), completedRes.json(), pendingRes.json(), inprogressRes.json()
+  ]);
+
+  const total = allData.total || 0;
+  const completed = completedData.total || 0;
+  const pending = pendingData.total || 0;
+  const inprogress = inprogressData.total || 0;
   const pct = total ? Math.round((completed / total) * 100) : 0;
 
   document.getElementById('stat-total').textContent = total;
@@ -348,7 +323,10 @@ async function loadDashboard() {
   document.getElementById('completion-label').textContent = `${completed} of ${total} tasks completed (${pct}%)`;
   document.getElementById('progress-bar').style.width = `${pct}%`;
 
-  const recent = tasks.slice(0, 5);
+  // Recent 5 tasks
+  const recentRes = await apiFetch('/api/v1/employee/tasks?page=1&limit=5');
+  const recentData = await recentRes.json();
+  const recent = recentData.tasks || [];
   const el = document.getElementById('recent-tasks');
   if (!recent.length) { el.innerHTML = `<div class="empty-state">No tasks assigned yet.</div>`; return; }
   el.innerHTML = `<table><thead><tr><th>Task</th><th>Status</th><th>Deadline</th></tr></thead><tbody>` +
@@ -379,6 +357,7 @@ async function loadTasks(page) {
 
   if (!data.tasks.length) {
     tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state">No tasks found.</div></td></tr>`;
+    document.getElementById('tasks-pagination').innerHTML = '';
   } else {
     tbody.innerHTML = data.tasks.map(t => {
       const overdue = !t.completed_at && new Date(t.deadline) < new Date();
@@ -403,7 +382,7 @@ async function loadTasks(page) {
     }).join('');
   }
 
-  const totalPages = data.total_pages || Math.ceil(data.total / 10);
+  const totalPages = data.total_pages || Math.ceil((data.total || 0) / 10);
   renderPagination('tasks-pagination', page, totalPages, loadTasks);
 }
 
@@ -412,21 +391,26 @@ async function updateStatus(taskId, status) {
     method: 'PATCH',
     body: JSON.stringify({ status })
   });
-  if (res.ok) loadTasks(currentTaskPage);
+  if (res.ok) {
+    loadTasks(currentTaskPage);
+    loadDashboard();
+  } else {
+    const err = await res.json().catch(() => ({}));
+    showAlert('tasks-alert', extractErrorMessage(err, 'Failed to update status.'), 'error');
+  }
 }
 
 // ── Team ─────────────────────────────────────────────────────────────────────
 function renderTeamPage() {
-  const teamId = getTeamId();
   const content = document.getElementById('team-content');
   const joinCard = document.getElementById('join-card');
 
-  if (teamId) {
+  if (currentTeamId) {
     content.innerHTML = `
       <div class="team-box">
         <div>
           <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Current team ID</div>
-          <div style="font-size:13px;color:var(--accent)">${escHtml(teamId)}</div>
+          <div style="font-size:13px;color:var(--accent)">${escHtml(String(currentTeamId))}</div>
         </div>
         <button class="btn btn-sm btn-danger" onclick="exitTeam()">Leave team</button>
       </div>`;
@@ -441,40 +425,34 @@ async function joinTeam() {
   const teamId = document.getElementById('join-team-id').value.trim();
   if (!teamId) return showAlert('team-alert', 'Enter a team ID.', 'error');
 
-  const res = await apiFetch('/api/v1/employee/team/join', { method: 'POST', body: JSON.stringify({ team_id: teamId }) });
+  const res = await apiFetch('/api/v1/employee/team/join', {
+    method: 'POST',
+    body: JSON.stringify({ team_id: teamId })
+  });
+
   if (res.ok) {
     const data = await res.json();
-    setTeamId(data.team_id);
+    // FIX: save team_id from server response into our in-memory variable
+    currentTeamId = data.team_id;
     document.getElementById('join-team-id').value = '';
     showAlert('team-alert', 'Joined team successfully!', 'success');
     renderTeamPage();
   } else {
-    let err = {};
-    try {
-      err = await res.json();
-    } catch (e) {
-      const text = await res.text().catch(() => '');
-      if (text) err = { detail: text };
-    }
+    const err = await res.json().catch(() => ({}));
     showAlert('team-alert', extractErrorMessage(err, 'Failed to join team.'), 'error');
   }
 }
 
 async function exitTeam() {
-  if (!confirm('Leave your current team? Your tasks will be unassigned.')) return;
+  if (!confirm('Leave your current team? Your incomplete tasks will be unassigned.')) return;
   const res = await apiFetch('/api/v1/employee/team/exit', { method: 'POST' });
   if (res.ok) {
-    setTeamId(null);
+    // FIX: clear in-memory team state
+    currentTeamId = null;
     showAlert('team-alert', 'Left team successfully.', 'success');
     renderTeamPage();
   } else {
-    let err = {};
-    try {
-      err = await res.json();
-    } catch (e) {
-      const text = await res.text().catch(() => '');
-      if (text) err = { detail: text };
-    }
+    const err = await res.json().catch(() => ({}));
     showAlert('team-alert', extractErrorMessage(err, 'Failed to leave team.'), 'error');
   }
 }
@@ -484,19 +462,16 @@ async function changePassword() {
   const old = document.getElementById('old-pass').value;
   const nw = document.getElementById('new-pass').value;
   if (!old || !nw) return showAlert('settings-alert', 'Fill in both fields.', 'error');
-  const res = await apiFetch('/api/v1/employee/change-password', { method: 'PATCH', body: JSON.stringify({ old_password: old, new_password: nw }) });
+  const res = await apiFetch('/api/v1/employee/change-password', {
+    method: 'PATCH',
+    body: JSON.stringify({ old_password: old, new_password: nw })
+  });
   if (res.ok) {
     showAlert('settings-alert', 'Password updated.', 'success');
     document.getElementById('old-pass').value = '';
     document.getElementById('new-pass').value = '';
   } else {
-    let err = {};
-    try {
-      err = await res.json();
-    } catch (e) {
-      const text = await res.text().catch(() => '');
-      if (text) err = { detail: text };
-    }
+    const err = await res.json().catch(() => ({}));
     showAlert('settings-alert', extractErrorMessage(err, 'Failed to update password.'), 'error');
   }
 }
@@ -504,7 +479,9 @@ async function changePassword() {
 // ── Logout ────────────────────────────────────────────────────────────────────
 async function handleLogout() {
   const refresh = localStorage.getItem('refresh_token');
-  if (refresh) await apiFetch('/api/v1/employee/logout', { method: 'POST', body: JSON.stringify({ refresh_token: refresh }) });
+  if (refresh) {
+    await apiFetch('/api/v1/employee/logout', { method: 'POST', body: JSON.stringify({ refresh_token: refresh }) });
+  }
   localStorage.clear();
   window.location.href = '/frontend/index.html';
 }
@@ -512,38 +489,21 @@ async function handleLogout() {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function extractErrorMessage(err, defaultMsg = 'An error occurred') {
   if (!err) return defaultMsg;
-  
-  // Direct string error
   if (typeof err === 'string') return err;
-  
-  // Check common error properties
   if (err.detail && typeof err.detail === 'string') return err.detail;
   if (err.message && typeof err.message === 'string') return err.message;
-  if (err.error && typeof err.error === 'string') return err.error;
   if (err.msg && typeof err.msg === 'string') return err.msg;
-  
-  // Check errors array
-  if (err.errors && Array.isArray(err.errors) && err.errors.length > 0) {
-    const first = err.errors[0];
-    if (typeof first === 'string') return first;
-    if (first && typeof first === 'object') {
-      if (first.msg && typeof first.msg === 'string') return first.msg;
-      if (first.message && typeof first.message === 'string') return first.message;
-      if (first.detail && typeof first.detail === 'string') return first.detail;
-    }
+  if (Array.isArray(err.detail) && err.detail.length > 0) {
+    const first = err.detail[0];
+    if (first.msg) return first.msg;
   }
-  
-  // Try to stringify entire object to see if there's useful info
-  try {
-    const str = JSON.stringify(err);
-    if (str && str !== '{}' && str.length < 200) return str;
-  } catch (e) {}
-  
+  try { const s = JSON.stringify(err); if (s && s !== '{}' && s.length < 200) return s; } catch {}
   return defaultMsg;
 }
 
 function showAlert(id, msg, type) {
   const el = document.getElementById(id);
+  if (!el) return;
   el.textContent = String(msg || 'An error occurred');
   el.className = `alert ${type} show`;
   setTimeout(() => el.className = 'alert', 4000);
@@ -558,11 +518,15 @@ function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'
 
 function renderPagination(containerId, current, total, callback) {
   const el = document.getElementById(containerId);
+  if (!el) return;
   if (total <= 1) { el.innerHTML = ''; return; }
   let html = `<span class="page-info">Page ${current} of ${total}</span>`;
   html += `<button class="page-btn" ${current===1?'disabled':''} onclick="${callback.name}(${current-1})">←</button>`;
   for (let i = 1; i <= total; i++) {
-    if (total > 7 && Math.abs(i-current) > 2 && i !== 1 && i !== total) { if (Math.abs(i-current)===3) html += `<span style="color:var(--muted)">…</span>`; continue; }
+    if (total > 7 && Math.abs(i-current) > 2 && i !== 1 && i !== total) {
+      if (Math.abs(i-current) === 3) html += `<span style="color:var(--muted)">…</span>`;
+      continue;
+    }
     html += `<button class="page-btn ${i===current?'active':''}" onclick="${callback.name}(${i})">${i}</button>`;
   }
   html += `<button class="page-btn" ${current===total?'disabled':''} onclick="${callback.name}(${current+1})">→</button>`;
