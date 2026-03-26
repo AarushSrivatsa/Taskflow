@@ -94,8 +94,8 @@ async def refresh(body: RefreshTokenSchema, db: AsyncSession = Depends(get_db)):
         select(EmployeeRefreshTokenModel).where(
             EmployeeRefreshTokenModel.token_hash == token_hash,
             EmployeeRefreshTokenModel.is_revoked == False
-        )
-    ).with_for_update()
+        ).with_for_update()
+    )
 
     db_token = result.scalar_one_or_none()
 
@@ -183,7 +183,8 @@ async def exit_team(
     )
     tasks = result.scalars().all()
     for task in tasks:
-        task.employee_id = None
+        if task.status != "completed":
+            task.employee_id = None
 
     employee.team_id = None
     await db.commit()

@@ -116,8 +116,8 @@ async def refresh(body: RefreshTokenSchema, db: AsyncSession = Depends(get_db)):
         select(ManagerRefreshTokenModel).where(
             ManagerRefreshTokenModel.token_hash == token_hash,
             ManagerRefreshTokenModel.is_revoked == False
-        )
-    ).with_for_update()
+        ).with_for_update()
+    )
 
     db_token = result.scalar_one_or_none()
 
