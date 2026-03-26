@@ -9,9 +9,9 @@ from security.passwords import hash_password, verify_password
 from pydantic import BaseModel, EmailStr, field_validator
 from datetime import datetime, timezone
 from typing import Optional
+from math import ceil
 
 router = APIRouter(prefix="/api/v1/employee", tags=["Employee"])
-
 
 # ─── Schemas ────────────────────────────────────────────────────────────────
 
@@ -54,7 +54,6 @@ class UpdateTaskStatusSchema(BaseModel):
             raise ValueError("Status must be pending, in_progress or completed")
         return v
 
-
 # ─── Auth ────────────────────────────────────────────────────────────────────
 
 @router.post("/register", summary="Register a new employee")
@@ -71,6 +70,7 @@ async def register(body: RegisterSchema, db: AsyncSession = Depends(get_db)):
     await db.flush()
 
     tokens = await create_tokens(employee.id, role="employee", db=db)
+    await db.commit()
     return {"employee_id": employee.id, **tokens}
 
 
@@ -95,7 +95,8 @@ async def refresh(body: RefreshTokenSchema, db: AsyncSession = Depends(get_db)):
             EmployeeRefreshTokenModel.token_hash == token_hash,
             EmployeeRefreshTokenModel.is_revoked == False
         )
-    )
+    ).with_for_update()
+
     db_token = result.scalar_one_or_none()
 
     if not db_token:
@@ -216,10 +217,12 @@ async def get_tasks(
     result = await db.execute(query.offset(offset).limit(limit))
     tasks = result.scalars().all()
 
+
     return {
         "page": page,
         "limit": limit,
         "total": total_count,
+        "total_pages": ceil(total_count / limit) if total_count else 0,
         "tasks": [
             {
                 "id": t.id,

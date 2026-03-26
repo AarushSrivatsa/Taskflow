@@ -1,3 +1,5 @@
+import re
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
@@ -8,7 +10,7 @@ from security.tokens import create_tokens, get_user_from_access_token, hash_refr
 from security.passwords import hash_password, verify_password
 from pydantic import BaseModel, EmailStr, field_validator
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Optional, Literal
 
 router = APIRouter(prefix="/api/v1/manager", tags=["Manager"])
 
@@ -65,13 +67,7 @@ class UpdateTaskSchema(BaseModel):
     task_description: Optional[str] = None
     deadline: Optional[datetime] = None
     employee_id: Optional[UUID] = None
-    status: Optional[str] = None
-
-    @field_validator("status")
-    def validate_status(cls, v):
-        if v not in ("pending", "in_progress", "completed"):
-            raise ValueError("Status must be pending, in_progress or completed")
-        return v
+    status: Optional[Literal["pending", "in_progress", "completed"]] = None
 
     @field_validator("deadline")
     def validate_deadline(cls, v):
@@ -93,7 +89,8 @@ async def register(body: RegisterSchema, db: AsyncSession = Depends(get_db)):
         hashed_password=hash_password(body.password)
     )
     db.add(manager)
-    await db.flush()
+    await db.commit()
+    await db.refresh(manager)
 
     tokens = await create_tokens(manager.id, role="manager", db=db)
     return {"manager_id": manager.id, **tokens}
@@ -120,7 +117,8 @@ async def refresh(body: RefreshTokenSchema, db: AsyncSession = Depends(get_db)):
             ManagerRefreshTokenModel.token_hash == token_hash,
             ManagerRefreshTokenModel.is_revoked == False
         )
-    )
+    ).with_for_update()
+
     db_token = result.scalar_one_or_none()
 
     if not db_token:
@@ -133,7 +131,6 @@ async def refresh(body: RefreshTokenSchema, db: AsyncSession = Depends(get_db)):
 
     tokens = await create_tokens(db_token.manager_id, role="manager", db=db)
     return tokens
-
 
 @router.post("/logout", summary="Logout manager")
 async def logout(
@@ -434,7 +431,6 @@ async def delete_task(
     await db.delete(task)
     await db.commit()
     return {"detail": "Task deleted"}
-
 
 # ─── Dashboard ───────────────────────────────────────────────────────────────
 
