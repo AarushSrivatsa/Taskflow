@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+sqlalchemy
+python-dotenv
+asyncpg
+python-jose
+argon2-cffi
+pydantic[email]
